@@ -109,7 +109,7 @@ def webhook():
         # Pass the query to the Groq model
         client = Groq()
         completion_ds = client.chat.completions.create(
-            model="deepseek-r1-distill-llama-70b",
+            model="llama-3.1-8b-instant"
             messages=[
                 {
                     "role": "user",
