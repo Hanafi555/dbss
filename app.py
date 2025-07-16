@@ -96,7 +96,7 @@ def telegram():
     
     return(render_template("telegram.html", status=status))
 
-@app.route("/stop telegram",methods=["GET","POST"])
+@app.route("/stop_telegram",methods=["GET","POST"])
 def stop_telegram():
     
     domain_url = 'https://dbss-1-sd96.onrender.com'
@@ -106,13 +106,9 @@ def stop_telegram():
     delete_webhook_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/deleteWebhook"
     requests.post(delete_webhook_url, json={"url": domain_url, "drop_pending_updates": True})
 
-    # Set the webhook URL for the Telegram bot
-    set_webhook_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/setWebhook?url={domain_url}/webhook"
-    webhook_response = requests.post(set_webhook_url, json={"url": domain_url, "drop_pending_updates": True})
-
     if webhook_response.status_code == 200:
         # set status message
-        status = "The telegram bot is stopped. Please check with the telegram bot. @The_Prediction_bot"
+        status = "The telegram bot is stopped."
     else:
         status = "Failed to stop the telegram bot. Please check the logs."
     
