@@ -12,7 +12,6 @@ app = Flask(__name__)
 #cv = joblib.load("cv_encoder.pkl")
 #model = joblib.load("model.pkl")
 #os.environ['GROQ_API_KEY'] = os.getenv("GROQ_API_KEY")
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 # for cloud ..........
@@ -38,7 +37,7 @@ def llama():
 def llama_reply():
     q = request.form.get("q")
     try:
-        client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+        client = Groq()
         completion = client.chat.completions.create(
             model="llama-3.1-8b-instant",
             messages=[{"role": "user", "content": q}]
