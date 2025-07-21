@@ -145,5 +145,18 @@ def webhook():
         })
     return('ok', 200)
 
+    # ----------- CHECK SPAM FEATURE -----------
+@app.route("/check_spam", methods=["GET", "POST"])
+def check_spam():
+    if request.method == "POST":
+        q = request.form.get("q")
+        # Dummy spam check logic; replace with your real model or logic
+        spam_words = ['buy', 'free', 'offer', 'win', 'cash', 'prize']
+        result = "Spam" if any(word in q.lower() for word in spam_words) else "Not Spam"
+        return render_template("check_spam_reply.html", r=result, q=q)
+    else:
+        return render_template("check_spam.html")
+# ------------------------------------------
+
 if __name__ == "__main__":
     app.run()
