@@ -10,6 +10,9 @@ import os
 cv = joblib.load("cv_encoder.pkl")
 model = joblib.load("model.pkl")
 #os.environ['GROQ_API_KEY'] = os.getenv("GROQ_API_KEY")
+groq_api_key = os.environ.get("GROQ_API_KEY")
+groq.configure(api_key=groq_api_key)
+
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 # for cloud ..........
 
