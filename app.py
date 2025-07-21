@@ -65,6 +65,10 @@ def deepseek_reply():
 def dbs():
     return(render_template("dbs.html"))
 
+@app.route("/check_spam",methods=["GET","POST"])
+def check_spam():
+    return(render_template("check_spam.html"))
+
 @app.route("/prediction",methods=["GET","POST"])
 def prediction():
     q = float(request.form.get("q"))
@@ -146,16 +150,16 @@ def webhook():
     return('ok', 200)
 
     # ----------- CHECK SPAM FEATURE -----------
-@app.route("/check_spam", methods=["GET", "POST"])
-def check_spam():
+@app.route("/check_spam_reply", methods=["GET", "POST"])
+def check_spam_reply():
     if request.method == "POST":
         q = request.form.get("q")
-        # Dummy spam check logic; replace with your real model or logic
-        spam_words = ['buy', 'free', 'offer', 'win', 'cash', 'prize']
-        result = "Spam" if any(word in q.lower() for word in spam_words) else "Not Spam"
+        # Use CountVectorizer and model to predict
+        q_vec = cv.transform([q])
+        result = model.predict(q_vec)[0]   # Should return 'spam' or 'ham'
         return render_template("check_spam_reply.html", r=result, q=q)
     else:
-        return render_template("check_spam.html")
+        return render_template("check_spam_reply.html")
 # ------------------------------------------
 
 if __name__ == "__main__":
