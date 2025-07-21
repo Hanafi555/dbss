@@ -31,17 +31,18 @@ def main():
 def llama():
     return render_template("llama.html")
 
-@app.route("/llama_reply",methods=["GET","POST"])
+@app.route("/llama_reply", methods=["GET", "POST"])
 def llama_reply():
     q = request.form.get("q")
     try:
-        client = Groq()
+        client = Groq(api_key=os.getenv("GROQ_API_KEY"))  # explicit use
         completion = client.chat.completions.create(
             model="llama-3.1-8b-instant",
             messages=[{"role": "user", "content": q}]
         )
         answer = completion.choices[0].message.content
     except Exception as e:
+        print(f"[LLAMA ERROR]: {str(e)}")  # logs to Render
         answer = f"Error: {str(e)}"
     return render_template("llama_reply.html", r=answer)
 
