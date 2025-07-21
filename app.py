@@ -17,58 +17,53 @@ app = Flask(__name__)
 
 @app.route("/",methods=["GET","POST"])
 def igindex():
-    return(render_template("index.html"))
+    return render_template("index.html")
 
 @app.route("/main",methods=["GET","POST"])
 def main():
     q = request.form.get("q")
     # db
-    return(render_template("main.html"))
+    return render_template("main.html")
 
 @app.route("/llama",methods=["GET","POST"])
 def llama():
-    return(render_template("llama.html"))
+    return render_template("llama.html")
 
 @app.route("/llama_reply",methods=["GET","POST"])
 def llama_reply():
     q = request.form.get("q")
-    # load model
-    client = Groq()
-    completion = client.chat.completions.create(
-        model="llama-3.1-8b-instant",
-        messages=[
-            {
-                "role": "user",
-                "content": q
-            }
-        ]
-    )
-    return(render_template("llama_reply.html",r=completion.choices[0].message.content))
+    try:
+        client = Groq()
+        completion = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[{"role": "user", "content": q}]
+        )
+        answer = completion.choices[0].message.content
+    except Exception as e:
+        answer = f"Error: {str(e)}"
+    return render_template("llama_reply.html", r=answer)
 
 @app.route("/deepseek",methods=["GET","POST"])
 def deepseek():
-    return(render_template("deepseek.html"))
+    return render_template("deepseek.html")
 
 @app.route("/deepseek_reply",methods=["GET","POST"])
 def deepseek_reply():
     q = request.form.get("q")
-    # load model
-    client = Groq()
-    completion = client.chat.completions.create(
-        model="deepseek-r1-distill-llama-70b",
-        messages=[
-            {
-                "role": "user",
-                "content": q
-            }
-        ]
-    )
-    return(render_template("deepseek_reply.html",r=completion.choices[0].message.content))
-
+    try:
+        client = Groq()
+        completion = client.chat.completions.create(
+            model="deepseek-r1-distill-llama-70b",
+            messages=[{"role": "user", "content": q}]
+        )
+        answer = completion.choices[0].message.content
+    except Exception as e:
+        answer = f"Error: {str(e)}"
+    return render_template("deepseek_reply.html", r=answer)
 
 @app.route("/dbs",methods=["GET","POST"])
 def dbs():
-    return(render_template("dbs.html"))
+    return render_template("dbs.html")
 
 @app.route("/check_spam", methods=["GET", "POST"])
 def check_spam():
@@ -78,75 +73,51 @@ def check_spam():
 def prediction():
     q = float(request.form.get("q"))
     # load model
-    model = joblib.load("dbs.jl")
-    # make prediction
-    pred = model.predict([[q]])
-    return(render_template("prediction.html",r=pred))
+    dbs_model = joblib.load("dbs.jl")
+    pred = dbs_model.predict([[q]])
+    return render_template("prediction.html", r=pred)
 
 @app.route("/telegram",methods=["GET","POST"])
 def telegram():
-    
-    # domain_url = 'https://dbss-1-sd96.onrender.com'
     domain_url = request.url_root
-
-
-    # The following line is used to delete the existing webhook URL for the Telegram bot
     delete_webhook_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/deleteWebhook"
     requests.post(delete_webhook_url, json={"url": domain_url, "drop_pending_updates": True})
 
-    # Set the webhook URL for the Telegram bot
     set_webhook_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/setWebhook?url={domain_url}/webhook"
     webhook_response = requests.post(set_webhook_url, json={"url": domain_url, "drop_pending_updates": True})
 
     if webhook_response.status_code == 200:
-        # set status message
         status = "The telegram bot is running. Please check with the telegram bot. @The_Prediction_bot"
     else:
         status = "Failed to start the telegram bot. Please check the logs."
-    
-    return(render_template("telegram.html", status=status))
+    return render_template("telegram.html", status=status)
 
 @app.route("/stop_telegram",methods=["GET","POST"])
 def stop_telegram():
-
     domain_url = 'https://dbss-1-sd96.onrender.com'
-
-    # The following line is used to delete the existing webhook URL for the Telegram bot
     delete_webhook_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/deleteWebhook"
     webhook_response = requests.post(delete_webhook_url, json={"url": domain_url, "drop_pending_updates": True})
 
     if webhook_response.status_code == 200:
-        # set status message
         status = "The telegram bot is stopped. "
     else:
         status = "Failed to stop the telegram bot. Please check the logs."
-    
-    return(render_template("telegram.html", status=status))
+    return render_template("telegram.html", status=status)
 
 @app.route("/webhook",methods=["GET","POST"])
 def webhook():
-
-    # This endpoint will be called by Telegram when a new message is received
     update = request.get_json()
     if "message" in update and "text" in update["message"]:
-        # Extract the chat ID and message text from the update
         chat_id = update["message"]["chat"]["id"]
         query = update["message"]["text"]
 
-        # Pass the query to the Groq model
         client = Groq()
         completion_ds = client.chat.completions.create(
             model="llama-3.1-8b-instant",
-            messages=[
-                {
-                    "role": "user",
-                    "content": query
-                }
-            ]
+            messages=[{"role": "user", "content": query}]
         )
         response_message = completion_ds.choices[0].message.content
 
-        # Send the response back to the Telegram chat
         send_message_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
         requests.post(send_message_url, json={
             "chat_id": chat_id,
@@ -154,18 +125,22 @@ def webhook():
         })
     return('ok', 200)
 
-    # ----------- CHECK SPAM FEATURE -----------
+# ----------- CHECK SPAM FEATURE -----------
 @app.route("/check_spam_reply", methods=["GET", "POST"])
 def check_spam_reply():
     if request.method == "POST":
-        q = request.form.get("q")
-        q_vec = cv.transform([q])
-        result = model.predict(q_vec)[0]   # Returns 'spam' or 'ham'
-        # Optional: display user-friendly text
-        # result = "Spam" if result == "spam" else "Not Spam"
+        q = request.form.get("q", "")
+        if not q:
+            result = "No input provided."
+        else:
+            try:
+                q_vec = cv.transform([q])
+                result = model.predict(q_vec)[0]
+            except Exception as e:
+                result = f"Error: {str(e)}"
         return render_template("check_spam_reply.html", r=result, q=q)
     else:
-        return render_template("check_spam_reply.html")
+        return render_template("check_spam_reply.html", r="", q="")
 # ------------------------------------------
 
 if __name__ == "__main__":
