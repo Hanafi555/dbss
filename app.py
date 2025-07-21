@@ -11,11 +11,6 @@ os.environ['GROQ_API_KEY'] = os.getenv("GROQ_API_KEY")
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 # for cloud ..........
 
-# ------------------- Load Models Once at Startup -------------------
-# These files must be in the same folder as app.py!
-cv = joblib.load("cv_encoder.pkl")
-model = joblib.load("model.pkl")
-
 app = Flask(__name__)
 
 @app.route("/",methods=["GET","POST"])
