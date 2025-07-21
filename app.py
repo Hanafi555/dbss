@@ -8,8 +8,7 @@ import os
 # ------------------- Load Models Once at Startup -------------------
 # These files must be in the same folder as app.py!
 cv = joblib.load("cv_encoder.pkl")
-model = joblib.load("cv_model.pkl")
-
+model = joblib.load("model.pkl")
 #os.environ['GROQ_API_KEY'] = os.getenv("GROQ_API_KEY")
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 # for cloud ..........
