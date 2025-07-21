@@ -4,6 +4,12 @@ from groq import Groq
 import requests
 
 import os
+
+# ------------------- Load Models Once at Startup -------------------
+# These files must be in the same folder as app.py!
+cv = joblib.load("cv_encoder.pkl")
+model = joblib.load("cv_model.pkl")
+
 #os.environ['GROQ_API_KEY'] = os.getenv("GROQ_API_KEY")
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 # for cloud ..........
@@ -65,9 +71,9 @@ def deepseek_reply():
 def dbs():
     return(render_template("dbs.html"))
 
-@app.route("/check_spam",methods=["GET","POST"])
+@app.route("/check_spam", methods=["GET", "POST"])
 def check_spam():
-    return(render_template("check_spam.html"))
+    return render_template("check_spam.html")
 
 @app.route("/prediction",methods=["GET","POST"])
 def prediction():
@@ -154,9 +160,10 @@ def webhook():
 def check_spam_reply():
     if request.method == "POST":
         q = request.form.get("q")
-        # Use CountVectorizer and model to predict
         q_vec = cv.transform([q])
-        result = model.predict(q_vec)[0]   # Should return 'spam' or 'ham'
+        result = model.predict(q_vec)[0]   # Returns 'spam' or 'ham'
+        # Optional: display user-friendly text
+        # result = "Spam" if result == "spam" else "Not Spam"
         return render_template("check_spam_reply.html", r=result, q=q)
     else:
         return render_template("check_spam_reply.html")
