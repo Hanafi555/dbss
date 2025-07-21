@@ -5,17 +5,17 @@ import requests
 
 import os
 
+app = Flask(__name__)
+
 # ------------------- Load Models Once at Startup -------------------
 # These files must be in the same folder as app.py!
-cv = joblib.load("cv_encoder.pkl")
-model = joblib.load("model.pkl")
+#cv = joblib.load("cv_encoder.pkl")
+#model = joblib.load("model.pkl")
 #os.environ['GROQ_API_KEY'] = os.getenv("GROQ_API_KEY")
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 # for cloud ..........
-
-app = Flask(__name__)
 
 @app.route("/",methods=["GET","POST"])
 def igindex():
@@ -32,6 +32,8 @@ def llama():
     return render_template("llama.html")
 
 
+
+# your real route
 @app.route("/llama_reply", methods=["GET", "POST"])
 def llama_reply():
     q = request.form.get("q")
@@ -46,6 +48,15 @@ def llama_reply():
         print(f"[LLAMA ERROR]: {str(e)}")
         answer = f"Error: {str(e)}"
     return render_template("llama_reply.html", r=answer)
+
+# your debug route (temporary)
+@app.route("/groq_test")
+def groq_test():
+    try:
+        r = requests.get("https://api.groq.com", timeout=5)
+        return f"Groq API status: {r.status_code}"
+    except Exception as e:
+        return f"Groq API error: {str(e)}"
 
 
 
