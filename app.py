@@ -32,14 +32,22 @@ def llama():
     return render_template("llama.html")
 
 
-@app.route("/groq_test")
-def groq_test():
+@app.route("/llama_reply", methods=["GET", "POST"])
+def llama_reply():
+    q = request.form.get("q")
     try:
-        r = requests.get("https://api.groq.com", timeout=5)
-        return f"Groq API status: {r.status_code}"
+        client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+        completion = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[{"role": "user", "content": q}]
+        )
+        answer = completion.choices[0].message.content
     except Exception as e:
-        return f"Groq API error: {str(e)}"
-        
+        print(f"[LLAMA ERROR]: {str(e)}")
+        answer = f"Error: {str(e)}"
+    return render_template("llama_reply.html", r=answer)
+
+
 
 @app.route("/deepseek",methods=["GET","POST"])
 def deepseek():
