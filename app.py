@@ -51,7 +51,7 @@ def llama_reply():
 def deepseek():
     return render_template("deepseek.html")
 
- python
+
 @app.route("/deepseek_reply",methods=["GET","POST"])
 def deepseek_reply():
     q = request.form.get("q")
