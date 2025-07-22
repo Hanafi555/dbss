@@ -31,7 +31,6 @@ def llama():
     return render_template("llama.html")
 
 
-
 # your real route
 @app.route("/llama_reply", methods=["GET", "POST"])
 def llama_reply():
@@ -48,34 +47,29 @@ def llama_reply():
         answer = f"Error: {str(e)}"
     return render_template("llama_reply.html", r=answer)
 
-# your debug route (temporary)
-@app.route("/groq_test")
-def groq_test():
-    try:
-        r = requests.get("https://api.groq.com", timeout=5)
-        return f"Groq API status: {r.status_code}"
-    except Exception as e:
-        return f"Groq API error: {str(e)}"
-
-
-
 @app.route("/deepseek",methods=["GET","POST"])
 def deepseek():
     return render_template("deepseek.html")
 
+ python
 @app.route("/deepseek_reply",methods=["GET","POST"])
 def deepseek_reply():
     q = request.form.get("q")
-    try:
-        client = Groq()
-        completion = client.chat.completions.create(
-            model="deepseek-r1-distill-llama-70b",
-            messages=[{"role": "user", "content": q}]
-        )
-        answer = completion.choices[0].message.content
-    except Exception as e:
-        answer = f"Error: {str(e)}"
-    return render_template("deepseek_reply.html", r=answer)
+
+    # load model
+    client = Groq()
+    completion = client.chat.completions.create(
+        model="deepseek-r1-distill-llama-70b",
+        messages=[
+            {
+                "role": "user",
+                "content": q
+            }
+        ]
+    )
+    # print(completion.choices[0].message.content)
+
+    return(render_template("deepseek_reply.html", r=completion.choices[0].message.content))
 
 @app.route("/dbs",methods=["GET","POST"])
 def dbs():
