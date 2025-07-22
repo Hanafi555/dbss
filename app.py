@@ -142,8 +142,11 @@ def check_spam_reply():
         if not q:
             result = "No input provided."
         else:
-            cv = joblib.load("cv_encoder.pkl")
-            model = joblib.load("model.pkl")
+            try:
+                # Load vectorizer and model
+                cv = joblib.load("cv_encoder.pkl")
+                model = joblib.load("lr_model.pkl")
+                # Transform input and predict
                 q_vec = cv.transform([q])
                 result = model.predict(q_vec)[0]
             except Exception as e:
