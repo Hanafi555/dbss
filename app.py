@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 import joblib
 from groq import Groq
 import requests
+import joblib
 
 import os
 
@@ -9,8 +10,8 @@ app = Flask(__name__)
 
 # ------------------- Load Models Once at Startup -------------------
 # These files must be in the same folder as app.py!
-#cv = joblib.load("cv_encoder.pkl")
-#model = joblib.load("model.pkl")
+cv = joblib.load("cv_encoder.pkl")
+model = joblib.load("model.pkl")
 #os.environ['GROQ_API_KEY'] = os.getenv("GROQ_API_KEY")
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
