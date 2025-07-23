@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delete Logs</title>
+    <style>
+        .warning { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Delete All Logs</h1>
+    <p class="warning">Are you sure you want to delete <b>ALL</b> logs? This action cannot be undone.</p>
+    <form action="/delete_log" method="post">
+        <input type="submit" value="Yes, Delete All Logs">
+    </form>
+    <br>
+    <a href="/main">Cancel / Back to Main</a>
+</body>
+</html>
+
