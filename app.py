@@ -181,7 +181,12 @@ def check_spam_reply():
         return render_template("check_spam_reply.html", r=result, q=q)
     else:
         return render_template("check_spam_reply.html", r="", q="")
+    
 # ------------------------------------------
+@app.route('/sepia', methods=['GET', 'POST'])
+def sepia():
+    return render_template("sepia_hf.html")
+
 
 if __name__ == "__main__":
     app.run()
